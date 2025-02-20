@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directory Picker Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #pickDirectory {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #fileList {
+            margin-top: 20px;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #fileList li {
+            padding: 8px;
+            margin: 4px 0;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        #fileList li a {
+            text-decoration: none;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Directory Picker Example</h1>
+    <button id="pickDirectory">Pick Directory</button>
+    <ul id="fileList"></ul>
+
+    <script>
+        document.getElementById('pickDirectory').addEventListener('click', async () => {
+            try {
+                const directoryHandle = await window.showDirectoryPicker();
+                const fileList = document.getElementById('fileList');
+                fileList.innerHTML = '';
+
+                for await (const entry of directoryHandle.values()) {
+                    if (entry.kind === 'file') {
+                        const li = document.createElement('li');
+                        const file = await entry.getFile();
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(file);
+                        a.textContent = `${entry.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                        li.appendChild(a);
+                        fileList.appendChild(li);
+                    }
+                }
+            } catch (error) {
+                console.error('Error picking directory:', error);
+                alert('Error picking directory. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
